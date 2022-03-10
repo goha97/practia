@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
@@ -14,7 +15,8 @@ class ProductoController extends Controller
      */
     public function index()
     {
-         return view('productos.index');
+        $datos['productos']=Producto::paginate(5);
+         return view('productos.index',$datos);
     }
 
     /**
@@ -37,7 +39,13 @@ class ProductoController extends Controller
     public function store(Request $request)
     {
         //
-    }
+        $datosProductos = request()->except('_token');
+        if($request-> hasFile('Imagen')){
+            $datosProductos['Imagen']=$request->file('Imagen')->store('ulpoads','public');
+        }
+        producto::insert($datosProductos);
+        return response()->json($datosProductos);
+     }
 
     /**
      * Display the specified resource.
@@ -56,9 +64,10 @@ class ProductoController extends Controller
      * @param  \App\Models\producto  $producto
      * @return \Illuminate\Http\Response
      */
-    public function edit(producto $producto)
+    public function edit($id)
     {
-        //
+        $productos=producto::findOrFail($id);
+        return view('productos.edit', compact('productos'));
     }
 
     /**
@@ -68,9 +77,19 @@ class ProductoController extends Controller
      * @param  \App\Models\producto  $producto
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, producto $producto)
+    public function update(Request $request, $id)
     {
-        //
+        $datosProductos = request()->except(['_token','_method']);
+
+        if($request-> hasFile('Imagen')){
+            $productos=producto::findOrFail($id);
+            Storage::delete('public/'.$productos->Imagen);
+            $datosProductos['Imagen']=$request->file('Imagen')->store('ulpoads','public');
+        }
+
+        producto::where('id','=',$id)->update($datosProductos);
+        $productos=producto::findOrFail($id);
+        return view('productos.edit', compact('productos'));
     }
 
     /**
@@ -79,8 +98,13 @@ class ProductoController extends Controller
      * @param  \App\Models\producto  $producto
      * @return \Illuminate\Http\Response
      */
-    public function destroy(producto $producto)
+    public function destroy($id)
     {
-        //
+
+       $productos=producto::findOrFail($id);
+        if(Storage::delete('public/'.$productos->Imagen)){
+        producto::destroy($id);
+       }
+        return redirect('productos');
     }
 }
