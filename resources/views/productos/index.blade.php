@@ -1,4 +1,14 @@
-<a href="{{url('productos/create')}}">registrar nevo producto</a>
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+
+@if (Session::has('mensaje'))
+{{Session::get('mensaje')}}
+
+@endif
+
+<a href="{{url('productos/create')}}" class="btn btn-primary">registrar nevo producto</a>
 <table class="table table-light">
     <thead class="thead-light">
         <tr>
@@ -20,16 +30,17 @@
                 <td>{{ $producto->Marca }}</td>
                 <td>{{ $producto->Modelo }}</td>
                 <td>{{ $producto->Valor }}</td>
-                <td>{{ $producto->Imagen }}
-                <img src="{{asset('storage').'/'.$producto->Imagen}}" width="100" alt="">
+                <td>
+                <img src="{{asset('storage').'/'.$producto->Imagen}}" class="img-thumbnail img-fluid" width="100" alt="">
                 </td>
                 <td>
-                    <a href="{{ url('productos/'.$producto->id.'/edit') }}"> Editar
-                    </a> |
+                    <a href="{{ url('productos/'.$producto->id.'/edit') }}" class="btn btn-warning"> Editar
+                    </a>
+                    <br>
                     <form action="{{ url('productos/' .$producto->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         {{method_field('delete')}}
-                        <input type="submit" onclick="return confirm('¿que quieres borrar?')" value="Borrar">
+                        <input type="submit" onclick="return confirm('¿que quieres borrar?')" value="Borrar" class="btn btn-danger">
                     </form>
                 </td>
 
@@ -37,3 +48,5 @@
         @endforeach
     </tbody>
 </table>
+</div>
+@endsection

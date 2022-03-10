@@ -38,13 +38,27 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
+
+        $campos=[
+            'Nombre'=>'required|string|max:100',
+            'Marca'=>'required|string|max:100',
+            'Modelo'=>'required|string|max:100',
+            'Valor'=>'required|string|max:100',
+            'Imagen'=>'required|max:10000|mimes:jpeg,png,jpg',
+        ];
+        $mensaje=[
+            'required'=>'El :attribute es requerido',
+            'Imagen.required'=>'La foto es requerida',
+        ];
+        $this->validate($request,$campos,$mensaje);
         //
         $datosProductos = request()->except('_token');
         if($request-> hasFile('Imagen')){
             $datosProductos['Imagen']=$request->file('Imagen')->store('ulpoads','public');
         }
         producto::insert($datosProductos);
-        return response()->json($datosProductos);
+      //  return response()->json($datosProductos);
+       return redirect('productos')->with ('mensaje','se ha agregado con exito');
      }
 
     /**
@@ -79,6 +93,24 @@ class ProductoController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $campos=[
+            'Nombre'=>'required|string|max:100',
+            'Marca'=>'required|string|max:100',
+            'Modelo'=>'required|string|max:100',
+            'Valor'=>'required|string|max:100',
+
+        ];
+        $mensaje=[
+            'required'=>'El :attribute es requerido',
+
+        ];
+        if($request-> hasFile('Imagen')){
+
+            $campos=['Imagen'=>'required|max:10000|mimes:jpeg,png,jpg'];
+            $mensaje=[ 'Imagen.required'=>'La foto es requerida'];
+        $this->validate($request,$campos,$mensaje);}
+
         $datosProductos = request()->except(['_token','_method']);
 
         if($request-> hasFile('Imagen')){
@@ -89,7 +121,8 @@ class ProductoController extends Controller
 
         producto::where('id','=',$id)->update($datosProductos);
         $productos=producto::findOrFail($id);
-        return view('productos.edit', compact('productos'));
+        //return view('productos.edit', compact('productos'));
+        return redirect('productos')->with('mensaje','producto modificado');
     }
 
     /**
@@ -106,5 +139,6 @@ class ProductoController extends Controller
         producto::destroy($id);
        }
         return redirect('productos');
+      return redirect('productos')->with('mensaje','producto borrado');
     }
 }

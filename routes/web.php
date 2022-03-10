@@ -14,11 +14,20 @@ use App\Http\Controllers\ProductoController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 /*
 Route::get('/productos', function () {
     return view('productos.create');
 });
 */
-Route::resource('productos', ProductoController::class);
+Route::resource('productos', ProductoController::class)-> middleware('auth');
+
+Auth::routes(['register'=>false,'reset'=>false]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::group(['middleware'=>'auth'],function(){
+    Route::get('/', [ProductoController::class, 'index'])->name('home');
+});
