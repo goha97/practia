@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\reserva;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReservaController extends Controller
 {
@@ -14,7 +15,9 @@ class ReservaController extends Controller
      */
     public function index()
     {
-        //
+
+        $datos['reservas']=reserva::paginate(5);
+        return view('reserva.index',$datos);
     }
 
     /**
@@ -24,6 +27,7 @@ class ReservaController extends Controller
      */
     public function create()
     {
+        return view('reserva.create');
         //
     }
 
@@ -35,6 +39,24 @@ class ReservaController extends Controller
      */
     public function store(Request $request)
     {
+        $campos=[
+            'Rut'=>'required|string|max:100',
+            'Nombre'=>'required|string|max:100',
+            'Apellido'=>'required|string|max:100',
+            'Producto'=>'required|string|max:100',
+
+        ];
+        $mensaje=[
+            'required'=>'El :attribute es requerido',
+
+        ];
+        $this->validate($request,$campos,$mensaje);
+        //R
+        $datosReserva = request()->except('_token');
+
+        reserva::insert($datosReserva);
+      //  return response()->json($datosProductos);
+       return redirect('reservas')->with ('mensaje','se ha agregado con exito');
         //
     }
 
@@ -55,8 +77,10 @@ class ReservaController extends Controller
      * @param  \App\Models\reserva  $reserva
      * @return \Illuminate\Http\Response
      */
-    public function edit(reserva $reserva)
+    public function edit($id)
     {
+        $reserva=reserva::findOrFail($id);
+        return view('reservas.edit', compact('reservas'));
         //
     }
 
@@ -67,8 +91,27 @@ class ReservaController extends Controller
      * @param  \App\Models\reserva  $reserva
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, reserva $reserva)
+    public function update(Request $request, $id)
     {
+        $campos=[
+            'Rut'=>'required|string|max:100',
+            'Nombre'=>'required|string|max:100',
+            'Apellido'=>'required|string|max:100',
+           // 'Producto'=>'required|string|max:100',
+        ];
+        $mensaje=[
+            'required'=>'El :attribute es requerido',
+
+        ];
+
+        $datosReserva = request()->except(['_token','_method']);
+
+
+
+        reserva::where('id','=',$id)->update($datosReserva);
+        $productos=reserva::findOrFail($id);
+
+        return redirect('reserva')->with('mensaje','reserva modificada');
         //
     }
 
@@ -78,8 +121,14 @@ class ReservaController extends Controller
      * @param  \App\Models\reserva  $reserva
      * @return \Illuminate\Http\Response
      */
-    public function destroy(reserva $reserva)
+    public function destroy($id)
     {
+        $reserva=reserva::findOrFail($id);
+
+            reserva::destroy($id);
+
+        return redirect('reserva');
+      return redirect('reserva')->with('mensaje','producto borrado');
         //
     }
 }

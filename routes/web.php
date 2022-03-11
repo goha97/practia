@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ReservaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,18 +17,25 @@ use App\Http\Controllers\ProductoController;
 Route::get('/', function () {
     return view('auth.login');
 });
-/*
-Route::get('/productos', function () {
-    return view('productos.create');
-});
-*/
+
+//Route::get('/Reservas', function () {
+ // return view('Reservas.create');
+//});
+
 Route::resource('productos', ProductoController::class)-> middleware('auth');
 
 Auth::routes(['register'=>false,'reset'=>false]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+//Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
 Route::group(['middleware'=>'auth'],function(){
     Route::get('/', [ProductoController::class, 'index'])->name('home');
+
 });
+
+//Route::group(['middleware'=>'auth'],function(){
+ //   Route::get('/',[ReservaController::class,'index'])->name('home');
+
+
+//});

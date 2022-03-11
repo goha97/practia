@@ -8,7 +8,7 @@
 
 @endif
 
-<a href="{{url('productos/create')}}" class="btn btn-primary">registrar nevo producto</a>
+<a href="{{url('productos/create')}}" class="btn btn-primary">registrar nuevo producto</a>
 <table class="table table-light">
     <thead class="thead-light">
         <tr>
